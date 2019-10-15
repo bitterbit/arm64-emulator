@@ -8,6 +8,9 @@ from keystone import *
 def get_register_for_key(key):
     return KEY_TO_REG[key]
 
+def get_all_registers():
+    return KEY_TO_REG.values()
+
 KEY_TO_REG = {
     "X0": UC_ARM64_REG_X0,
     "X1": UC_ARM64_REG_X1,
@@ -38,8 +41,6 @@ KEY_TO_REG = {
     "X26": UC_ARM64_REG_X26,
     "X27": UC_ARM64_REG_X27,
     "X28": UC_ARM64_REG_X28,
-    #"SP": UC_ARCH_ARM64_SP,
-    #"PC": UC_ARCH_ARM64_PC,
 }
 
 def hook_block(uc, address, size, user_data):
@@ -78,16 +79,16 @@ class Emulator(object):
     def start(self):
         self.mu.mem_map(ADDRESS, 2 * 1024 * 1024)
         self.mu.mem_write(ADDRESS, self.code)
+        [self.mu.reg_write(reg, 0) for reg in get_all_registers()] # TODO: is this needed? 
         [self.mu.reg_write(get_register_for_key(reg), val) for reg,val in self.registers.items()]
-
-        self.mu.reg_write(UC_ARM64_REG_X11, 0x12345678)
-        self.mu.reg_write(UC_ARM64_REG_X13, 0x10008)
-        self.mu.reg_write(UC_ARM64_REG_X15, 0x33)
+        
+        self.mu.mem_map(ADDRESS + 0x200000, 2 * 1024 * 1024)
+        self.mu.reg_write(UC_ARM64_REG_SP, ADDRESS + 0x200000)
 
         self.mu.hook_add(UC_HOOK_BLOCK, hook_block)
         self.mu.hook_add(UC_HOOK_CODE, hook_code, begin=ADDRESS, end=ADDRESS)
-        print ("0x%x - 0x%x" % (ADDRESS, ADDRESS + self.code_len))
         self.mu.emu_start(ADDRESS, ADDRESS + self.code_len)
+
         print (">>> Emulation done.")
         print (">>> X0: 0x%x" % self.mu.reg_read(UC_ARM64_REG_X0))
         print (">>> X1: 0x%x" % self.mu.reg_read(UC_ARM64_REG_X1))

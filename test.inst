@@ -3,3 +3,5 @@ X0: 0x123
 X15: 0x15
 ---
 add x0, x0, #1
+str x0, [sp, #0x8]
+ldr w1, [sp, #0x8]
