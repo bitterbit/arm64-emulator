@@ -7,6 +7,10 @@ from keystone import *
 
 def get_register_for_key(key):
     return KEY_TO_REG[key]
+def get_key_for_reg(reg):
+    for key, r in KEY_TO_REG.items():
+        if r == reg:
+            return key
 
 def get_all_registers():
     return KEY_TO_REG.values()
@@ -76,6 +80,25 @@ class Emulator(object):
         self.code = b''.join([chr(x) for x in encoding])
         self.code_len = len(self.code)
 
+    def print_state(self):
+        self.print_registers()
+
+    def print_registers(self):
+        CELL_WIDTH = 10
+        register_rows = [(get_key_for_reg(x), self.mu.reg_read(x)) for x in sorted(get_all_registers())]
+        register_rows.append(("SP",self.mu.reg_read(UC_ARM64_REG_SP))) 
+        register_rows.append(("PC",self.mu.reg_read(UC_ARM64_REG_PC))) 
+        s = ""
+        for i in range(len(register_rows)):
+            name, val = register_rows[i]
+            cell = str(name) + ": " + hex(val)[:-1] 
+            cell += (CELL_WIDTH - len(cell)) * ' '
+            s += cell + '\t'
+            if i % 4  == 3:
+                s += '\n'
+        print (s)
+
+
     def start(self):
         self.mu.mem_map(ADDRESS, 2 * 1024 * 1024)
         self.mu.mem_write(ADDRESS, self.code)
@@ -90,8 +113,7 @@ class Emulator(object):
         self.mu.emu_start(ADDRESS, ADDRESS + self.code_len)
 
         print (">>> Emulation done.")
-        print (">>> X0: 0x%x" % self.mu.reg_read(UC_ARM64_REG_X0))
-        print (">>> X1: 0x%x" % self.mu.reg_read(UC_ARM64_REG_X1))
+        self.print_state()
 
 
 def main():
