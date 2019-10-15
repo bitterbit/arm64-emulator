@@ -5,6 +5,9 @@ from unicorn import *
 from unicorn.arm64_const import *
 from keystone import *
 
+
+# Needs unicorn >= 1.0.2-rc1
+
 def get_register_for_key(key):
     return KEY_TO_REG[key]
 def get_key_for_reg(reg):
@@ -45,6 +48,7 @@ KEY_TO_REG = {
     "X26": UC_ARM64_REG_X26,
     "X27": UC_ARM64_REG_X27,
     "X28": UC_ARM64_REG_X28,
+    "V0": UC_ARM64_REG_V0,
 }
 
 def hook_block(uc, address, size, user_data):
@@ -110,7 +114,16 @@ class Emulator(object):
 
         self.mu.hook_add(UC_HOOK_BLOCK, hook_block)
         self.mu.hook_add(UC_HOOK_CODE, hook_code, begin=ADDRESS, end=ADDRESS)
-        self.mu.emu_start(ADDRESS, ADDRESS + self.code_len)
+
+        # https://github.com/unicorn-engine/unicorn/issues/940
+        x = self.mu.reg_read(UC_ARM64_REG_CPACR_EL1)
+        x |= 0x300000; # set FPEN bit
+        self.mu.reg_write(UC_ARM64_REG_CPACR_EL1, x);
+
+        try:
+            self.mu.emu_start(ADDRESS, ADDRESS + self.code_len)
+        except UcError as e:
+            print("ERROR: %s" % e)
 
         print (">>> Emulation done.")
         self.print_state()
