@@ -1,5 +1,6 @@
 from __future__ import print_function
 import frontmatter
+from hexdump import hexdump
 
 from unicorn import *
 from unicorn.arm64_const import *
@@ -10,6 +11,7 @@ from keystone import *
 
 def get_register_for_key(key):
     return KEY_TO_REG[key]
+
 def get_key_for_reg(reg):
     for key, r in KEY_TO_REG.items():
         if r == reg:
@@ -84,8 +86,14 @@ class Emulator(object):
         self.code = b''.join([chr(x) for x in encoding])
         self.code_len = len(self.code)
 
+    def _get_sp(self):
+        return self.mu.reg_read(UC_ARM64_REG_SP)
+
     def print_state(self):
+        print(">>> Registers")
         self.print_registers()
+        print(">>> Stack 0x%x" % self._get_sp())
+        self.print_mem(self._get_sp())
 
     def print_registers(self):
         CELL_WIDTH = 10
@@ -102,6 +110,10 @@ class Emulator(object):
                 s += '\n'
         print (s)
 
+    def print_mem(self, addr, size=128):
+        mem = self.mu.mem_read(addr, size)
+        mem = b''.join([chr(x) for x in mem])
+        hexdump(mem)
 
     def start(self):
         self.mu.mem_map(ADDRESS, 2 * 1024 * 1024)
