@@ -97,7 +97,7 @@ class Emulator(object):
         self.print_mem(self._get_sp())
 
     def print_registers(self):
-        CELL_WIDTH = 10
+        CELL_WIDTH = 20
         register_rows = [(get_key_for_reg(x), self.mu.reg_read(x)) for x in sorted(get_all_registers())]
         register_rows.append(("SP",self.mu.reg_read(UC_ARM64_REG_SP))) 
         register_rows.append(("PC",self.mu.reg_read(UC_ARM64_REG_PC))) 
