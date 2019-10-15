@@ -2,15 +2,27 @@
 X0: 0x123
 X2: 0x1
 X3: 0x1
+X4: 0x123456789abcdef
 X15: 0x15
 ---
 add x0, x0, #1
 str x0, [sp, #0x8]
 ldr w1, [sp, #0x8]
 
-MOVI            V0.2D, #0
-STP             Q0, Q0, [sp,#0x3F0]
 
-MOV X8, SP 
-ADD X8, X8, #0x3F0
-ldp X2, X3, [X8]
+
+STUR X4, [SP]
+STUR X4, [SP,#0x8]
+STUR X4, [SP,#0x10]
+STUR X4, [SP,#0x18]
+STUR X4, [SP,#0x20]
+STUR X4, [SP,#0x28]
+STUR X4, [SP,#0x30]
+STUR X4, [SP,#0x38]
+STUR X4, [SP,#0x40]
+STUR X4, [SP,#0x48]
+STUR X4, [SP,#0x50]
+STUR X4, [SP,#0x58]
+
+MOVI            V0.2D, #0 
+STP             Q0, Q0, [sp,#0x10]
