@@ -53,6 +53,7 @@ KEY_TO_REG = {
     "V0": UC_ARM64_REG_V0,
 }
 
+# TODO use this
 def hook_block(uc, address, size, user_data):
     print(">>> Tracing basic block at 0x%x, block size = 0x%x" %(address, size))
 
@@ -137,15 +138,13 @@ class Emulator(object):
         except UcError as e:
             print("ERROR: %s" % e)
 
-        print (">>> Emulation done.")
+        print (">>> Emulation done.\n")
         self.print_state()
 
 
 def main():
     e = Emulator()
     e.load_instructions('test.inst')
-    print ("asm", e.asm)
-    print ("registers", e.registers)
     e.start()
 
 if __name__ == '__main__':
