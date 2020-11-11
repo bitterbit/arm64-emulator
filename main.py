@@ -84,7 +84,6 @@ class Emulator(object):
     def _set_asm(self, asm):
         self.asm = asm
         encoding, count = self.ks.asm(asm)
-        print('encoding??', encoding)
         self.code = bytes(encoding)
         self.code_len = len(self.code)
 
