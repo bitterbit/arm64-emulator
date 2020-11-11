@@ -104,7 +104,7 @@ class Emulator(object):
         s = ""
         for i in range(len(register_rows)):
             name, val = register_rows[i]
-            cell = str(name) + ": " + hex(val)[:-1] 
+            cell = str(name) + ": " + hex(val) 
             cell += (CELL_WIDTH - len(cell)) * ' '
             s += cell + '\t'
             if i % 4  == 3:
