@@ -84,7 +84,8 @@ class Emulator(object):
     def _set_asm(self, asm):
         self.asm = asm
         encoding, count = self.ks.asm(asm)
-        self.code = b''.join([chr(x) for x in encoding])
+        print('encoding??', encoding)
+        self.code = bytes(encoding)
         self.code_len = len(self.code)
 
     def _get_sp(self):
@@ -113,7 +114,7 @@ class Emulator(object):
 
     def print_mem(self, addr, size=128):
         mem = self.mu.mem_read(addr, size)
-        mem = b''.join([chr(x) for x in mem])
+        mem = bytes(mem)
         hexdump(mem)
 
     def start(self):
